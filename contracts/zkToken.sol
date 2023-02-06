@@ -6,7 +6,6 @@ import "./IVerifier.sol";
 contract zkToken {
     string public name = "zkToken";
     string public symbol = "ZKT";
-    uint256 public totalSupply = 5000000; // 5 000 000
     uint256 public decimals = 0;
 
     IVerifier private senderVerifierAddr;
@@ -14,7 +13,7 @@ contract zkToken {
 
     mapping(address => uint256[2]) private balanceHashes;
 
-    /* name, symbol, totalSupply, decimals */
+    /* name, symbol, decimals */
     constructor(address _senderVerifierAddr, address _receiverVerifierAddr) {
         senderVerifierAddr = IVerifier(_senderVerifierAddr);
         receiverVerifierAddr = IVerifier(_receiverVerifierAddr);
