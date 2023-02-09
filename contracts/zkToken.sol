@@ -68,7 +68,7 @@ contract zkToken {
         IVerifier.Proof memory proofR,
         IVerifier.Proof memory proofS,
         uint256[6] memory input
-    ) external {
+    ) external payable onlyFee {
         uint256[2] memory hashSenderBalanceBefore = balanceHashes[msg.sender];
         uint256[2] memory hashReceiverBalanceBefore = balanceHashes[_to];
 
@@ -107,5 +107,10 @@ contract zkToken {
             balanceHashes[msg.sender] = [input[2], input[3]];
             balanceHashes[_to] = [input[4], input[5]];
         } else revert("False Proofs");
+    }
+
+    modifier onlyFee() {
+        require(msg.value >= 0.001 ether, "Not enough fee!");
+        _;
     }
 }

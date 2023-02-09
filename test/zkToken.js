@@ -9,6 +9,9 @@ const receiverProof2 = require('./receiverProof2.json')
 
 describe('zkToken', function () {
   let zkToken, client1, client2, client3
+
+  const fee = ethers.utils.parseUnits('0.001', 'ether')
+
   before(async function () {
     ;[client1, client2, client3] = await ethers.getSigners()
     const ReceiverVerifier = await hre.ethers.getContractFactory(
@@ -17,13 +20,13 @@ describe('zkToken', function () {
     const receiverVerifier = await ReceiverVerifier.deploy()
     await receiverVerifier.deployed()
 
-    console.log(`ReceiverVerifier deployed to ${receiverVerifier.address}`)
+    // console.log(`ReceiverVerifier deployed to ${receiverVerifier.address}`)
 
     const SenderVerifier = await hre.ethers.getContractFactory('senderVerifier')
     const senderVerifier = await SenderVerifier.deploy()
     await senderVerifier.deployed()
 
-    console.log(`SenderVerifier deployed to ${senderVerifier.address}`)
+    // console.log(`SenderVerifier deployed to ${senderVerifier.address}`)
 
     const zkToken_ = await hre.ethers.getContractFactory('zkToken')
     zkToken = await zkToken_.deploy(
@@ -32,7 +35,7 @@ describe('zkToken', function () {
     )
     await zkToken.deployed()
 
-    console.log(`SenderVerifier deployed to ${zkToken.address}`)
+    // console.log(`SenderVerifier deployed to ${zkToken.address}`)
   })
 
   it('name', async function () {
@@ -97,6 +100,7 @@ describe('zkToken', function () {
         receiverProof.inputs[4],
         receiverProof.inputs[5],
       ],
+      { value: fee },
     )
     // client1 = 5
     // client2 = 10
@@ -126,6 +130,7 @@ describe('zkToken', function () {
         receiverProof2.inputs[4],
         receiverProof2.inputs[5],
       ],
+      { value: fee },
     )
     // client1 = 0
     // client3 = 5
@@ -137,5 +142,22 @@ describe('zkToken', function () {
     balance = await zkToken.balanceOf(client3.address)
     expect(balance[0] == '263561599766550617289250058199814760685').to.eq(true)
     expect(balance[1] == '65303172752238645975888084098459749904').to.eq(true)
+  })
+  it('transfer fee revert', async function () {
+    await expect(
+      zkToken.transfer(
+        client3.address,
+        receiverProof2.proof,
+        senderProof2.proof,
+        [
+          senderProof2.inputs[0],
+          senderProof2.inputs[1],
+          senderProof2.inputs[4],
+          senderProof2.inputs[5],
+          receiverProof2.inputs[4],
+          receiverProof2.inputs[5],
+        ],
+      ),
+    ).to.be.revertedWith('Not enough fee!')
   })
 })
