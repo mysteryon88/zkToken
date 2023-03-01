@@ -10,6 +10,7 @@ contract zkToken {
 
     IVerifier private senderVerifierAddr;
     IVerifier private registrationVerifierAddr;
+    IVerifier private mintVerifierAddr;
 
     struct Key {
         uint256 n;
@@ -26,37 +27,42 @@ contract zkToken {
     /* name, symbol, decimals */
     constructor(
         address _senderVerifierAddr,
-        address _registrationVerifierAddr
+        address _registrationVerifierAddr /*,
+        address _mintVerifierAddr*/
     ) {
         senderVerifierAddr = IVerifier(_senderVerifierAddr);
         registrationVerifierAddr = IVerifier(_registrationVerifierAddr);
+        //mintVerifierAddr = IVerifier(_mintVerifierAddr);
     }
 
     function balanceOf(address _to) external view returns (uint256) {
         return users[_to].encryptedBalance;
     }
 
-    // для регистрации нужно создание еще одного доказательства
     /* onlyFee */
-    function registration(User memory user) external payable /* onlyFee */ {
+    function registration(
+        User memory user,
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint[4] memory input
+    ) external payable /* onlyFee */ {
         require(user.encryptedBalance >= 0, "wrong balance value");
         require(user.key.g >= 0 && user.key.n >= 0, "invalid key value");
-        users[msg.sender] = user;
+
+        bool registrationProofIsCorrect = registrationVerifierAddr
+            .verifyRegistrationProof(a, b, c, input);
+        if(registrationProofIsCorrect)
+            users[msg.sender] = user;
+        else revert("Wrong Proof");
+       
     }
 
-    function mint(
-        address _to,
-        IVerifier.Proof memory proof,
-        uint256[4] memory input
-    ) external {
-        User storage user = users[_to];
-    }
+    function mint(address _to) external {}
 
-    function transfer(
-        address _to,
-        IVerifier.Proof memory proofR,
-        uint256[6] memory input
-    ) external payable /* onlyFee */ {}
+    function transfer(address _to) external payable /* onlyFee */ {
+
+    }
 
     modifier onlyFee() {
         require(msg.value >= 0.001 ether, "Not enough fee!");
