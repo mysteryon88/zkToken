@@ -13,8 +13,8 @@ contract zkToken {
     IVerifier private mintVerifierAddr;
 
     struct Key {
-        uint256 n;
         uint256 g;
+        uint256 n;
     }
 
     struct User {

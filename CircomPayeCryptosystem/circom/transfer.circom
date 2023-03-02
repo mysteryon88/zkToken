@@ -18,7 +18,7 @@ template Binpower() {
             res = (res * base) % modulo;
         }
         
-        base = ( base * base) % modulo;
+        base = (base * base) % modulo;
         exp >>= 1;
     }
     out <-- res;
