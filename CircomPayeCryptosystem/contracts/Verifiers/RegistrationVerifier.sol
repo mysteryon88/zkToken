@@ -118,11 +118,11 @@ contract RegistrationVerifier {
     }
 
     /// @return r  bool true if proof is valid
-    function verifyRegistrationProof(
+    function verifyProof(
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[4] memory input
+        uint[/*4*/] memory input
     ) public view returns (bool r) {
         Proof memory proof;
         proof.A = Pairing.G1Point(a[0], a[1]);

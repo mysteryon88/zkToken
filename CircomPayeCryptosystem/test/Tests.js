@@ -6,7 +6,7 @@ const registrationInput = require('./RegistrationProof/input.json')
 const transferProof = require('./TransferProof/proof.json')
 
 describe('zkToken', function () {
-  let zkToken, client1, client2, client3, registrationVerifier
+  let zkToken, registrationVerifier, transferVerifier, client1, client2, client3
 
   const fee = ethers.utils.parseUnits('0.001', 'ether')
 
@@ -22,7 +22,7 @@ describe('zkToken', function () {
     const TransferVerifier = await hre.ethers.getContractFactory(
       'TransferVerifier',
     )
-    const transferVerifier = await TransferVerifier.deploy()
+    transferVerifier = await TransferVerifier.deploy()
     await transferVerifier.deployed()
 
     const zkToken_ = await hre.ethers.getContractFactory('zkToken')
@@ -42,7 +42,7 @@ describe('zkToken', function () {
   })
 
   it('verifyRegistrationProof', async function () {
-    await registrationVerifier.verifyRegistrationProof(
+    await registrationVerifier.verifyProof(
       [registrationProof.pi_a[0], registrationProof.pi_a[1]],
       [
         [registrationProof.pi_b[0][1], registrationProof.pi_b[0][0]],

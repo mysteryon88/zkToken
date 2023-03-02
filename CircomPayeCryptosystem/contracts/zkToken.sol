@@ -40,22 +40,26 @@ contract zkToken {
     }
 
     /* onlyFee */
+    // можно уменьшить кол-во агрументов ибо g и n повторяются в input и user
     function registration(
         User memory user,
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[4] memory input
+        uint /*4*/[] memory input
     ) external payable /* onlyFee */ {
         require(user.encryptedBalance >= 0, "wrong balance value");
         require(user.key.g >= 0 && user.key.n >= 0, "invalid key value");
 
-        bool registrationProofIsCorrect = registrationVerifierAddr
-            .verifyRegistrationProof(a, b, c, input);
-        if(registrationProofIsCorrect)
-            users[msg.sender] = user;
+        bool registrationProofIsCorrect = registrationVerifierAddr.verifyProof(
+            a,
+            b,
+            c,
+            input
+        );
+
+        if (registrationProofIsCorrect) users[msg.sender] = user;
         else revert("Wrong Proof");
-       
     }
 
     function mint(address _to) external {}
