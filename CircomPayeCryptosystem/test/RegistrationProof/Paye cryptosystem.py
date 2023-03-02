@@ -46,12 +46,13 @@ def main():
     print("private key n =", n, "g =", g)
     print("public key", l, mu)
     # random open text
-    m = 0
+    m = 10
     print("open text", m)
     r = random.randint(0, n - 1)
-    r = 30697292
+    # r = 30697292
     print("r =", r)
     c = encryption(g, m, r, n)
+    c = 1223454382402021
     print("encrypted number", c)
     m1 = decryption(c, n, l, mu)
     if (m == m1):

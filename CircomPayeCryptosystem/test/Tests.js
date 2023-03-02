@@ -3,15 +3,20 @@ const { ethers } = require('hardhat')
 const registrationProof = require('./RegistrationProof/proof.json')
 const registrationPublic = require('./RegistrationProof/public.json')
 const registrationInput = require('./RegistrationProof/input.json')
+
+const mintProof = require('./MintProof/proof.json')
+const mintPublic = require('./MintProof/public.json')
+const mintInput = require('./MintProof/input.json')
+
 const transferProof = require('./TransferProof/proof.json')
 
 describe('zkToken', function () {
-  let zkToken, registrationVerifier, transferVerifier, client1, client2, client3
+  let zkToken, registrationVerifier, transferVerifier, mintVerifier, client1, client2, client3
 
   const fee = ethers.utils.parseUnits('0.001', 'ether')
 
   before(async function () {
-    ;[client1, client2, client3] = await ethers.getSigners()
+    [client1, client2, client3] = await ethers.getSigners()
 
     const RegistrationVerifier = await hre.ethers.getContractFactory(
       'RegistrationVerifier',
@@ -25,10 +30,17 @@ describe('zkToken', function () {
     transferVerifier = await TransferVerifier.deploy()
     await transferVerifier.deployed()
 
-    const zkToken_ = await hre.ethers.getContractFactory('zkToken')
-    zkToken = await zkToken_.deploy(
+    const MintVerifier = await hre.ethers.getContractFactory(
+      'MintVerifier',
+    )
+    mintVerifier = await MintVerifier.deploy()
+    await mintVerifier.deployed()
+
+    const ZKToken = await hre.ethers.getContractFactory('zkToken')
+    zkToken = await ZKToken.deploy(
       transferVerifier.address,
       registrationVerifier.address,
+      mintVerifier.address
     )
     await zkToken.deployed()
   })
@@ -52,6 +64,19 @@ describe('zkToken', function () {
       registrationPublic,
     )
   })
+
+  it('verifyMintProof', async function () {
+    await mintVerifier.verifyProof(
+      [mintProof.pi_a[0], mintProof.pi_a[1]],
+      [
+        [mintProof.pi_b[0][1], mintProof.pi_b[0][0]],
+        [mintProof.pi_b[1][1], mintProof.pi_b[1][0]],
+      ],
+      [mintProof.pi_c[0], mintProof.pi_c[1]],
+      mintPublic,
+    )
+  })
+
   it('registration', async function () {
     await zkToken.registration(
       [
@@ -67,8 +92,22 @@ describe('zkToken', function () {
       registrationPublic,
     )
 
-    expect(await zkToken.balanceOf(client1.address)).to.eq(
-      registrationInput.encryptedBalance,
+    expect(await zkToken.balanceOf(client1.address)).to.eq(registrationInput.encryptedBalance)
+  })
+
+  it('mint', async function () {
+    await zkToken.mint(client1.address,
+
+      [mintProof.pi_a[0], mintProof.pi_a[1]],
+      [
+        [mintProof.pi_b[0][1], mintProof.pi_b[0][0]],
+        [mintProof.pi_b[1][1], mintProof.pi_b[1][0]],
+      ],
+      [mintProof.pi_c[0], mintProof.pi_c[1]],
+      mintPublic,
     )
+
+    console.log(await zkToken.balanceOf(client1.address))
+    //expect(await zkToken.balanceOf(client1.address)).to.eq(registrationInput.encryptedBalance)
   })
 })

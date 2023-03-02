@@ -27,12 +27,12 @@ contract zkToken {
     /* name, symbol, decimals */
     constructor(
         address _senderVerifierAddr,
-        address _registrationVerifierAddr /*,
-        address _mintVerifierAddr*/
+        address _registrationVerifierAddr,
+        address _mintVerifierAddr
     ) {
         senderVerifierAddr = IVerifier(_senderVerifierAddr);
         registrationVerifierAddr = IVerifier(_registrationVerifierAddr);
-        //mintVerifierAddr = IVerifier(_mintVerifierAddr);
+        mintVerifierAddr = IVerifier(_mintVerifierAddr);
     }
 
     function balanceOf(address _to) external view returns (uint256) {
@@ -62,7 +62,20 @@ contract zkToken {
         else revert("Wrong Proof");
     }
 
-    function mint(address _to) external {}
+    function mint(
+        address _to,
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint /*4*/[] memory input
+    ) external {
+        bool mintProofIsCorrect = mintVerifierAddr.verifyProof(a, b, c, input);
+        if (mintProofIsCorrect) {
+            users[_to].encryptedBalance =
+                (users[_to].encryptedBalance * input[0]) %
+                (users[_to].key.n * users[_to].key.n);
+        } else revert("Wrong Proof");
+    }
 
     function transfer(address _to) external payable /* onlyFee */ {
 
