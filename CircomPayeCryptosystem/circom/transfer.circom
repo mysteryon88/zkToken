@@ -8,6 +8,8 @@ template Main() {
 	signal input newEncryptedBalance;
     signal input senderBalance;
 	signal input value;
+	// old r
+	signal input r;
 	// PubKey = g, r, n
 	signal input senderPubKey[3];
 	signal input reciverPubKey[3];
@@ -23,7 +25,7 @@ template Main() {
 	pow1.e <== senderBalance;
 	pow1.modulo <== senderPubKey[2] * senderPubKey[2];
 
-	pow2.b <== senderPubKey[1];
+	pow2.b <== r;
 	pow2.e <== senderPubKey[2];
 	pow2.modulo <== senderPubKey[2] * senderPubKey[2];
 

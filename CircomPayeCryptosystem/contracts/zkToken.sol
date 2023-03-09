@@ -8,7 +8,7 @@ contract zkToken {
     string public symbol = "ZKT";
     uint256 public decimals = 0;
 
-    IVerifier private senderVerifierAddr;
+    IVerifier private transferVerifierAddr;
     IVerifier private registrationVerifierAddr;
     IVerifier private mintVerifierAddr;
 
@@ -26,11 +26,11 @@ contract zkToken {
 
     /* name, symbol, decimals */
     constructor(
-        address _senderVerifierAddr,
+        address _transferVerifieqAddr,
         address _registrationVerifierAddr,
         address _mintVerifierAddr
     ) {
-        senderVerifierAddr = IVerifier(_senderVerifierAddr);
+        transferVerifierAddr = IVerifier(_transferVerifieqAddr);
         registrationVerifierAddr = IVerifier(_registrationVerifierAddr);
         mintVerifierAddr = IVerifier(_mintVerifierAddr);
     }
@@ -77,8 +77,31 @@ contract zkToken {
         } else revert("Wrong Proof");
     }
 
-    function transfer(address _to) external payable /* onlyFee */ {
+    function transfer(
+        address _to,
+        uint[2] memory a,
+        uint[2][2] memory b,
+        uint[2] memory c,
+        uint /*9*/[] memory input
+    ) external payable /* onlyFee */ {
+        User storage user = users[_to];
+        require(user.encryptedBalance != 0, "user not registered");
+        require(user.key.g >= 0 && user.key.n >= 0, "invalid key value");
 
+        bool transferProofIsCorrect = transferVerifierAddr.verifyProof(
+            a,
+            b,
+            c,
+            input
+        );
+
+        if (transferProofIsCorrect) {
+            users[_to].encryptedBalance =
+                (users[_to].encryptedBalance * input[0]) %
+                (users[_to].key.n * users[_to].key.n);
+
+            users[msg.sender].encryptedBalance = input[2];
+        } else revert("Wrong Proof");
     }
 
     modifier onlyFee() {
