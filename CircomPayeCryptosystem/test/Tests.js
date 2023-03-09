@@ -53,26 +53,7 @@ describe('zkToken', function () {
     )
     await zkToken.deployed()
   })
-  /*    
-          decryption
-  
-  function powToMod(base, power, module) {
-    if (power === 1n) return base
-    if (power % 2n === 0n)
-      return powToMod(base, power / 2n, module) ** 2n % module
-    return (powToMod(base, power - 1n, module) * base) % module
-  }
 
-  // powToMod(366142356n, 1447804911n, 219020071n)
-
-  function L(u, n) {
-    return (u - 1n) / n
-  }
-
-  function decryption(c, n, l, mu) {
-    return (L(powToMod(c, l, n * n), n) * mu) % n
-  }
-*/
   it('name', async function () {
     expect(await zkToken.name()).to.eq('zkToken')
   })
@@ -205,5 +186,21 @@ describe('zkToken', function () {
       transferInputA.newEncryptedBalance
     )
     console.log('Balance client B:', await zkToken.balanceOf(clientB.address))
+  })
+
+  it('revert error registration', async function () {
+    await expect(
+      zkToken.connect(clientA).registration(
+        [transferProofA.pi_a[0], transferProofA.pi_a[1]],
+        [
+          [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
+          [transferProofA.pi_b[1][1], transferProofA.pi_b[1][0]],
+        ],
+        [transferProofA.pi_c[0], transferProofA.pi_c[1]],
+        registrationPublicA
+      )
+    )
+      .to.be.revertedWithCustomError(zkToken, 'WrongProof')
+      .withArgs('Wrong proof')
   })
 })

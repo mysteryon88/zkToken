@@ -28,6 +28,8 @@ contract zkToken {
     event Mint(address indexed _to);
     event Transfer(address indexed _to);
 
+    error WrongProof(string _error);
+
     /* name, symbol, decimals */
     constructor(
         address _transferVerifieqAddr,
@@ -52,7 +54,7 @@ contract zkToken {
     ) external payable /* onlyFee */ {
         require(input[0] >= 0, "wrong balance value");
         // input = balance, key.g, r, key.n
-        require(input[1] >= 0 && input[3] >= 0, "invalid key value"); 
+        require(input[1] >= 0 && input[3] >= 0, "invalid key value");
 
         bool registrationProofIsCorrect = registrationVerifierAddr.verifyProof(
             a,
@@ -66,9 +68,7 @@ contract zkToken {
             users[msg.sender].key.g = input[1];
             users[msg.sender].key.n = input[3];
             emit Registration(msg.sender);
-        }   
-        else revert("Wrong Proof");
-        
+        } else revert WrongProof("Wrong proof");
     }
 
     function mint(
@@ -84,8 +84,8 @@ contract zkToken {
             users[_to].encryptedBalance =
                 (users[_to].encryptedBalance * input[0]) %
                 (users[_to].key.n * users[_to].key.n);
-            emit Mint(_to); 
-        } else revert("Wrong Proof");
+            emit Mint(_to);
+        } else revert WrongProof("Wrong proof");
     }
 
     function transfer(
@@ -115,7 +115,7 @@ contract zkToken {
 
             users[msg.sender].encryptedBalance = input[2];
             emit Transfer(_to);
-        } else revert("Wrong Proof");
+        } else revert WrongProof("Wrong proof");
     }
 
     modifier onlyFee() {
