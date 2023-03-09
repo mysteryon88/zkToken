@@ -52,7 +52,7 @@ def main():
     # r = 13620829
     print("r =", r)
     c = encryption(g, m, r, n)
-    #c = 1223454382402021
+    #c = 225038593180971 # 5
     print("encrypted number", c)
     m1 = decryption(c, n, l, mu)
     if (m == m1):

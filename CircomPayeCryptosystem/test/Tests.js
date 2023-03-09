@@ -183,5 +183,36 @@ describe('zkToken', function () {
     */
   })
 
-  it('Transfer A to B', async function () {})
+  it('Revert self-transfer', async function () {
+    await expect(
+      zkToken.connect(clientB).transfer(
+        clientB.address,
+        [transferProofA.pi_a[0], transferProofA.pi_a[1]],
+        [
+          [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
+          [transferProofA.pi_b[1][1], transferProofA.pi_b[1][0]],
+        ],
+        [transferProofA.pi_c[0], transferProofA.pi_c[1]],
+        transferPublicA
+      )
+    ).to.be.revertedWith('you cannot send money to yourself')
+  })
+
+  it('Transfer A to B', async function () {
+    await zkToken.connect(clientA).transfer(
+      clientB.address,
+      [transferProofA.pi_a[0], transferProofA.pi_a[1]],
+      [
+        [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
+        [transferProofA.pi_b[1][1], transferProofA.pi_b[1][0]],
+      ],
+      [transferProofA.pi_c[0], transferProofA.pi_c[1]],
+      transferPublicA
+    )
+
+    expect(await zkToken.balanceOf(clientA.address)).to.eq(
+      transferInputA.newEncryptedBalance
+    )
+    console.log('Balance client B:', await zkToken.balanceOf(clientB.address))
+  })
 })

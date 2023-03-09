@@ -69,6 +69,7 @@ contract zkToken {
         uint[2] memory c,
         uint /*4*/[] memory input
     ) external {
+        require(_to != address(0), "zero address");
         bool mintProofIsCorrect = mintVerifierAddr.verifyProof(a, b, c, input);
         if (mintProofIsCorrect) {
             users[_to].encryptedBalance =
@@ -84,6 +85,7 @@ contract zkToken {
         uint[2] memory c,
         uint /*9*/[] memory input
     ) external payable /* onlyFee */ {
+        require(msg.sender != _to, "you cannot send money to yourself");
         User storage user = users[_to];
         require(user.encryptedBalance != 0, "user not registered");
         require(user.key.g >= 0 && user.key.n >= 0, "invalid key value");
@@ -97,7 +99,7 @@ contract zkToken {
 
         if (transferProofIsCorrect) {
             users[_to].encryptedBalance =
-                (users[_to].encryptedBalance * input[0]) %
+                (users[_to].encryptedBalance * input[1]) %
                 (users[_to].key.n * users[_to].key.n);
 
             users[msg.sender].encryptedBalance = input[2];
