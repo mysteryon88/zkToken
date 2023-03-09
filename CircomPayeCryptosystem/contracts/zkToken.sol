@@ -24,6 +24,10 @@ contract zkToken {
 
     mapping(address => User) private users;
 
+    event Registration(address indexed _who);
+    event Mint(address indexed _to);
+    event Transfer(address indexed _to);
+
     /* name, symbol, decimals */
     constructor(
         address _transferVerifieqAddr,
@@ -40,16 +44,15 @@ contract zkToken {
     }
 
     /* onlyFee */
-    // можно уменьшить кол-во агрументов ибо g и n повторяются в input и user
     function registration(
-        User memory user,
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
         uint /*4*/[] memory input
     ) external payable /* onlyFee */ {
-        require(user.encryptedBalance >= 0, "wrong balance value");
-        require(user.key.g >= 0 && user.key.n >= 0, "invalid key value");
+        require(input[0] >= 0, "wrong balance value");
+        // input = balance, key.g, r, key.n
+        require(input[1] >= 0 && input[3] >= 0, "invalid key value"); 
 
         bool registrationProofIsCorrect = registrationVerifierAddr.verifyProof(
             a,
@@ -58,8 +61,14 @@ contract zkToken {
             input
         );
 
-        if (registrationProofIsCorrect) users[msg.sender] = user;
+        if (registrationProofIsCorrect) {
+            users[msg.sender].encryptedBalance = input[0];
+            users[msg.sender].key.g = input[1];
+            users[msg.sender].key.n = input[3];
+            emit Registration(msg.sender);
+        }   
         else revert("Wrong Proof");
+        
     }
 
     function mint(
@@ -75,6 +84,7 @@ contract zkToken {
             users[_to].encryptedBalance =
                 (users[_to].encryptedBalance * input[0]) %
                 (users[_to].key.n * users[_to].key.n);
+            emit Mint(_to); 
         } else revert("Wrong Proof");
     }
 
@@ -86,6 +96,7 @@ contract zkToken {
         uint /*9*/[] memory input
     ) external payable /* onlyFee */ {
         require(msg.sender != _to, "you cannot send money to yourself");
+        require(_to != address(0), "zero address");
         User storage user = users[_to];
         require(user.encryptedBalance != 0, "user not registered");
         require(user.key.g >= 0 && user.key.n >= 0, "invalid key value");
@@ -103,6 +114,7 @@ contract zkToken {
                 (users[_to].key.n * users[_to].key.n);
 
             users[msg.sender].encryptedBalance = input[2];
+            emit Transfer(_to);
         } else revert("Wrong Proof");
     }
 

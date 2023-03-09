@@ -11,7 +11,6 @@ const registrationInputB = require('./RegistrationProof/inputB.json')
 
 const mintProof = require('./MintProof/proof.json')
 const mintPublic = require('./MintProof/public.json')
-// const mintInput = require('./MintProof/input.json')
 
 const transferProofA = require('./TransferProof/proofA.json')
 const transferPublicA = require('./TransferProof/publicA.json')
@@ -120,10 +119,6 @@ describe('zkToken', function () {
 
   it('registration A', async function () {
     await zkToken.connect(clientA).registration(
-      [
-        registrationInputA.encryptedBalance,
-        [registrationInputA.pubKey[0], registrationInputA.pubKey[2]],
-      ],
       [registrationProofA.pi_a[0], registrationProofA.pi_a[1]],
       [
         [registrationProofA.pi_b[0][1], registrationProofA.pi_b[0][0]],
@@ -140,10 +135,6 @@ describe('zkToken', function () {
 
   it('registration B', async function () {
     await zkToken.connect(clientB).registration(
-      [
-        registrationInputB.encryptedBalance,
-        [registrationInputB.pubKey[0], registrationInputB.pubKey[2]],
-      ],
       [registrationProofB.pi_a[0], registrationProofB.pi_a[1]],
       [
         [registrationProofB.pi_b[0][1], registrationProofB.pi_b[0][0]],
