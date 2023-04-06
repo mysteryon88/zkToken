@@ -64,6 +64,7 @@ contract zkToken {
         require(input[0] >= 0, "wrong balance value");
         // input = balance, key.g, r, key.n
         require(input[1] >= 0 && input[3] >= 0, "invalid key value");
+        require(users[msg.sender].encryptedBalance == 0, "you are registered");
 
         bool registrationProofIsCorrect = registrationVerifierAddr.verifyProof(
             a,
@@ -89,6 +90,9 @@ contract zkToken {
     ) external onlyRegistered(_to) {
         require(_to != address(0), "zero address");
 
+        // defense against false evidence
+        input[4] = users[_to].encryptedBalance;
+
         bool mintProofIsCorrect = mintVerifierAddr.verifyProof(a, b, c, input);
         if (mintProofIsCorrect) {
             users[_to].encryptedBalance = input[5];
@@ -105,6 +109,10 @@ contract zkToken {
     ) external payable /* onlyFee */ onlyRegistered(_to) {
         require(msg.sender != _to, "you cannot send tokens to yourself");
         require(_to != address(0), "zero address");
+
+        // defense against false evidence
+        input[0] = users[msg.sender].encryptedBalance;
+        input[9] = users[_to].encryptedBalance;
 
         bool transferProofIsCorrect = transferVerifierAddr.verifyProof(
             a,
@@ -125,8 +133,8 @@ contract zkToken {
         _;
     }
 
-    modifier onlyRegistered(address _to) {
-        require(users[_to].encryptedBalance != 0, "user not registered");
+    modifier onlyRegistered(address _addr) {
+        require(users[_addr].encryptedBalance != 0, "user not registered");
         _;
     }
 }

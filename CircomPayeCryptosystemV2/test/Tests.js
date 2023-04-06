@@ -262,7 +262,7 @@ describe('zkToken', function () {
 
   it('revert error registration', async function () {
     await expect(
-      zkToken.connect(clientA).registration(
+      zkToken.connect(clientC).registration(
         [transferProofA.pi_a[0], transferProofA.pi_a[1]],
         [
           [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
@@ -275,19 +275,19 @@ describe('zkToken', function () {
       .to.be.revertedWithCustomError(zkToken, 'WrongProof')
       .withArgs('Wrong proof')
   })
+
   it('onlyRegistered modifier', async function () {
     await expect(
-      zkToken.connect(clientB).transfer(
-        clientC.address,
-        [transferProofB.pi_a[0], transferProofB.pi_a[1]],
+      zkToken.connect(clientA).registration(
+        [transferProofA.pi_a[0], transferProofA.pi_a[1]],
         [
-          [transferProofB.pi_b[0][1], transferProofB.pi_b[0][0]],
-          [transferProofB.pi_b[1][1], transferProofB.pi_b[1][0]],
+          [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
+          [transferProofA.pi_b[1][1], transferProofA.pi_b[1][0]],
         ],
-        [transferProofB.pi_c[0], transferProofB.pi_c[1]],
-        transferPublicB
+        [transferProofA.pi_c[0], transferProofA.pi_c[1]],
+        registrationPublicA
       )
-    ).to.be.revertedWith('user not registered')
+    ).to.be.revertedWith('you are registered')
   })
 })
 
