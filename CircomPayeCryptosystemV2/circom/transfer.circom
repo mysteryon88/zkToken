@@ -11,12 +11,12 @@ template Main() {
 
 	// PubKey = g, rand r, n
 	signal input senderPubKey[3];
-	signal input reciverPubKey[3];
-	// l mu n
+	signal input receiverPubKey[3];
+	// l, mu, n
 	signal input senderPrivKey[3];
 
-	signal input encryptedReciverBalance;
-	signal input newEncryptedReciverBalance;
+	signal input encryptedReceiverBalance;
+	signal input newEncryptedReceiverBalance;
 
 	// value cannot be negative
 	assert(value > 0);
@@ -37,15 +37,15 @@ template Main() {
 	component pow3 = Binpower();
 	component pow4 = Binpower();
 
-	pow3.b <== reciverPubKey[0];
+	pow3.b <== receiverPubKey[0];
 	pow3.e <== value;
-	pow3.modulo <== reciverPubKey[2] * reciverPubKey[2];
+	pow3.modulo <== receiverPubKey[2] * receiverPubKey[2];
 
-	pow4.b <== reciverPubKey[1];
-	pow4.e <== reciverPubKey[2];
-	pow4.modulo <== reciverPubKey[2] * reciverPubKey[2];
+	pow4.b <== receiverPubKey[1];
+	pow4.e <== receiverPubKey[2];
+	pow4.modulo <== receiverPubKey[2] * receiverPubKey[2];
 
-	signal enValue <-- (pow3.out * pow4.out) % (reciverPubKey[2] * reciverPubKey[2]);
+	signal enValue <-- (pow3.out * pow4.out) % (receiverPubKey[2] * receiverPubKey[2]);
 	encryptedValue === enValue;
 
 	// checking the correctness of the new balance
@@ -64,9 +64,9 @@ template Main() {
 	newEncryptedSenderBalance === enNewEncryptedSenderBalance;
 
 	// verification of the correctly calculated new balance of the recipient
-	signal enNewEncryptedReciverBalance <-- (encryptedReciverBalance * encryptedValue) % (reciverPubKey[2] * reciverPubKey[2]);
+	signal enNewEncryptedReceiverBalance <-- (encryptedReceiverBalance * encryptedValue) % (receiverPubKey[2] * receiverPubKey[2]);
 
-	newEncryptedReciverBalance === enNewEncryptedReciverBalance;
+	newEncryptedReceiverBalance === enNewEncryptedReceiverBalance;
 }
 
 // public data
@@ -75,7 +75,7 @@ component main {
 				newEncryptedSenderBalance,	// sender calculates 
 				encryptedValue,				// sender calculates
 				senderPubKey, 				// in storage + rand r
-				reciverPubKey,				// in storage + rand r
-				encryptedReciverBalance,	// in storage
-				newEncryptedReciverBalance]	// sender calculates
+				receiverPubKey,				// in storage + rand r
+				encryptedReceiverBalance,	// in storage
+				newEncryptedReceiverBalance]	// sender calculates
 				} = Main();

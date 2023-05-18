@@ -105,7 +105,7 @@ describe('zkToken', function () {
   })
 
   it('registration A', async function () {
-    await zkToken.connect(clientA).registration(
+    const tx = await zkToken.connect(clientA).registration(
       [registrationProofA.pi_a[0], registrationProofA.pi_a[1]],
       [
         [registrationProofA.pi_b[0][1], registrationProofA.pi_b[0][0]],
@@ -113,6 +113,15 @@ describe('zkToken', function () {
       ],
       [registrationProofA.pi_c[0], registrationProofA.pi_c[1]],
       registrationPublicA
+    )
+
+    const receipt = await tx.wait()
+
+    console.log(
+      'Gas used by registration: ',
+      '\x1b[33m',
+      receipt.gasUsed.toString(),
+      '\x1b[0m'
     )
 
     expect(await zkToken.balanceOf(clientA.address)).to.eq(
@@ -126,7 +135,7 @@ describe('zkToken', function () {
   })
 
   it('registration B', async function () {
-    await zkToken.connect(clientB).registration(
+    const tx = await zkToken.connect(clientB).registration(
       [registrationProofB.pi_a[0], registrationProofB.pi_a[1]],
       [
         [registrationProofB.pi_b[0][1], registrationProofB.pi_b[0][0]],
@@ -134,6 +143,15 @@ describe('zkToken', function () {
       ],
       [registrationProofB.pi_c[0], registrationProofB.pi_c[1]],
       registrationPublicB
+    )
+
+    const receipt = await tx.wait()
+
+    console.log(
+      'Gas used by registration: ',
+      '\x1b[33m',
+      receipt.gasUsed.toString(),
+      '\x1b[0m'
     )
 
     expect(await zkToken.balanceOf(clientB.address)).to.eq(
@@ -147,7 +165,7 @@ describe('zkToken', function () {
   })
 
   it('mint A', async function () {
-    await zkToken.mint(
+    const tx = await zkToken.mint(
       clientA.address,
       [mintProof.pi_a[0], mintProof.pi_a[1]],
       [
@@ -166,6 +184,15 @@ describe('zkToken', function () {
         39229921n
       )
     ).to.eq(mintInput.value)
+
+    const receipt = await tx.wait()
+
+    console.log(
+      'Gas used by mint: ',
+      '\x1b[33m',
+      receipt.gasUsed.toString(),
+      '\x1b[0m'
+    )
 
     console.log(
       'Client A balance after mint',
@@ -189,7 +216,7 @@ describe('zkToken', function () {
   })
 
   it('Transfer A to B', async function () {
-    await zkToken.connect(clientA).transfer(
+    const tx = await zkToken.connect(clientA).transfer(
       clientB.address,
       [transferProofA.pi_a[0], transferProofA.pi_a[1]],
       [
@@ -198,6 +225,15 @@ describe('zkToken', function () {
       ],
       [transferProofA.pi_c[0], transferProofA.pi_c[1]],
       transferPublicA
+    )
+
+    const receipt = await tx.wait()
+
+    console.log(
+      'Gas used by transfer: ',
+      '\x1b[33m',
+      receipt.gasUsed.toString(),
+      '\x1b[0m'
     )
 
     expect(await zkToken.balanceOf(clientA.address)).to.eq(
@@ -225,7 +261,7 @@ describe('zkToken', function () {
   })
 
   it('Transfer B to A', async function () {
-    await zkToken.connect(clientB).transfer(
+    const tx = await zkToken.connect(clientB).transfer(
       clientA.address,
       [transferProofB.pi_a[0], transferProofB.pi_a[1]],
       [
@@ -234,6 +270,15 @@ describe('zkToken', function () {
       ],
       [transferProofB.pi_c[0], transferProofB.pi_c[1]],
       transferPublicB
+    )
+
+    const receipt = await tx.wait()
+
+    console.log(
+      'Gas used by transfer: ',
+      '\x1b[33m',
+      receipt.gasUsed.toString(),
+      '\x1b[0m'
     )
 
     expect(await zkToken.balanceOf(clientB.address)).to.eq(
@@ -271,10 +316,9 @@ describe('zkToken', function () {
         [transferProofA.pi_c[0], transferProofA.pi_c[1]],
         registrationPublicA
       )
-    )
-      .to.be.revertedWithCustomError(zkToken, 'WrongProof')
-      .withArgs('Wrong proof')
+    ).to.be.revertedWith('you are registered')
   })
+
   it('onlyRegistered modifier', async function () {
     await expect(
       zkToken.connect(clientB).transfer(
