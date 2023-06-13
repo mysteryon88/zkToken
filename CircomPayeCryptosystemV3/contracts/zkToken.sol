@@ -6,6 +6,7 @@ import "./IVerifier.sol";
 /// @title zkToken
 
 contract zkToken {
+
     string public name = "zkToken";
     string public symbol = "ZKT";
     uint256 public decimals = 0;
@@ -92,17 +93,19 @@ contract zkToken {
         uint[2] memory c,
         uint /*4*/[] memory input
     ) external onlyRegistered(_to) zeroAddress(_to) {
-
+        
         bool mintProofIsCorrect = mintVerifierAddr.verifyProof(a, b, c, input);
 
         User storage user = users[_to];
 
         if (mintProofIsCorrect) {
+            
             unchecked {
                 user.encryptedBalance =
                     (user.encryptedBalance * input[0]) %
                     user.key.powN2;
             }
+
             emit Mint(_to);
         } else revert WrongProof("Wrong proof");
     }
@@ -114,7 +117,7 @@ contract zkToken {
         uint[2] memory c,
         uint /*9*/[] memory input
     ) external payable /* onlyFee */ onlyRegistered(_to) zeroAddress(_to) {
-        require(msg.sender != _to, "You cannot send tokens to yourself");
+        require(msg.sender != _to, "you cannot send tokens to yourself");
 
         bool transferProofIsCorrect = transferVerifierAddr.verifyProof(
             a,

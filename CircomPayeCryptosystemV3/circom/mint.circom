@@ -1,13 +1,13 @@
-pragma circom 2.1.3;
+pragma circom 2.1.5;
 
 include "binpower.circom";
 
 template Main() {
 	signal input encryptedValue;
 	signal input value;
-	// PubKey = g, r, n
+	// public key: g, rand r, n
 	signal input receiverPubKey[3];
-
+	
 	// value cannot be negative
 	assert(value > 0);
 
@@ -29,7 +29,7 @@ template Main() {
 
 // public data
 component main {
-		public [encryptedValue,		// sender calculates
+		public [encryptedValue,			// calculates + send to mint function
 				receiverPubKey] 		// in storage + rand r
 				} = Main();
 
