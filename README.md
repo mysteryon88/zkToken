@@ -15,9 +15,19 @@ Tools: circom (Linux) + snarkJS
 
 ## CircomPayeCryptosystemV2
 
-Second version of the protocol
+The second version of the protocol
 
 Uses homomorphic balance encryption (Paye cryptosystem), the recipient's new balance is calculated on the sender's side. Proof of computation is sent to the smart contract.
+
+Tools: circom (Linux) + snarkJS
+
+## CircomPayeCryptosystemV3
+
+The third version of the protocol
+
+Gas optimization.
+
+Uses homomorphic balance encryption (Paye cryptosystem), the balances of the sender and recipient are homomorphically added in the smart contract with the transfer amount calculated on the sender's side. The proof of computation is sent to the smart contract.
 
 Tools: circom (Linux) + snarkJS
 
