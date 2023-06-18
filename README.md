@@ -29,7 +29,7 @@ Gas optimization.
 
 Uses homomorphic balance encryption (Paye cryptosystem), the balances of the sender and recipient are homomorphically added in the smart contract with the transfer amount calculated on the sender's side. The proof of computation is sent to the smart contract.
 
-Tools: circom (Linux) + snarkJS
+Tools: circom (Linux) + snarkJS + using paillier-bigint
 
 ## ZoKratesSHA256
 
