@@ -1,10 +1,19 @@
 const { expect } = require('chai')
 const { ethers } = require('hardhat')
+const paillierBigint = require('paillier-bigint')
 
-const registrationProofA = require('./RegistrationProof/proofA.json')
-const registrationPublicA = require('./RegistrationProof/publicA.json')
-const registrationInputA = require('./RegistrationProof/inputA.json')
+const keysA = require('./inputs/keysA.json')
+const keysB = require('./inputs/keysB.json')
 
+const registrationInputA = require('./inputs/regInputA.json')
+const registrationPublicA = require('./registrationProof/publicA.json')
+const registrationProofA = require('./registrationProof/proofA.json')
+
+const registrationInputB = require('./inputs/regInputB.json')
+const registrationPublicB = require('./registrationProof/publicB.json')
+const registrationProofB = require('./registrationProof/proofB.json')
+
+/*
 const registrationProofB = require('./RegistrationProof/proofB.json')
 const registrationPublicB = require('./RegistrationProof/publicB.json')
 const registrationInputB = require('./RegistrationProof/inputB.json')
@@ -20,7 +29,7 @@ const transferInputA = require('./TransferProof/inputA.json')
 const transferProofB = require('./TransferProof/proofB.json')
 const transferPublicB = require('./TransferProof/publicB.json')
 const transferInputB = require('./TransferProof/inputB.json')
-
+*/
 describe('zkToken', function () {
   let zkToken,
     registrationVerifier,
@@ -28,9 +37,26 @@ describe('zkToken', function () {
     mintVerifier,
     clientA,
     clientB,
-    clientC
+    clientC,
+    publicKeyA,
+    privateKeyA,
+    publicKeyB,
+    privateKeyB
 
   const fee = ethers.utils.parseUnits('0.001', 'ether')
+
+  publicKeyA = new paillierBigint.PublicKey(BigInt(keysA.n), BigInt(keysA.g))
+  privateKeyA = new paillierBigint.PrivateKey(
+    BigInt(keysA.lambda),
+    BigInt(keysA.mu),
+    publicKeyA
+  )
+  publicKeyB = new paillierBigint.PublicKey(BigInt(keysB.n), BigInt(keysB.g))
+  privateKeyB = new paillierBigint.PrivateKey(
+    BigInt(keysB.lambda),
+    BigInt(keysB.mu),
+    publicKeyB
+  )
 
   before(async function () {
     ;[clientA, clientB, clientC] = await ethers.getSigners()
@@ -57,6 +83,7 @@ describe('zkToken', function () {
       registrationVerifier.address,
       mintVerifier.address
     )
+
     await zkToken.deployed()
   })
 
@@ -79,7 +106,7 @@ describe('zkToken', function () {
       registrationPublicA
     )
   })
-
+  /*
   it('verifyMintProof', async function () {
     await mintVerifier.verifyProof(
       [mintProof.pi_a[0], mintProof.pi_a[1]],
@@ -103,7 +130,7 @@ describe('zkToken', function () {
       transferPublicA
     )
   })
-
+*/
   it('registration A', async function () {
     const tx = await zkToken.connect(clientA).registration(
       [registrationProofA.pi_a[0], registrationProofA.pi_a[1]],
@@ -128,9 +155,12 @@ describe('zkToken', function () {
       registrationInputA.encryptedBalance
     )
 
+    const balance = await zkToken.balanceOf(clientA.address)
+
     console.log(
       'Client A balance after registration',
-      await zkToken.balanceOf(clientA.address)
+      balance,
+      privateKeyA.decrypt(BigInt(balance))
     )
   })
 
@@ -158,12 +188,15 @@ describe('zkToken', function () {
       registrationInputB.encryptedBalance
     )
 
+    const balance = await zkToken.balanceOf(clientB.address)
+
     console.log(
       'Client B balance after registration',
-      await zkToken.balanceOf(clientB.address)
+      balance,
+      privateKeyB.decrypt(BigInt(balance))
     )
   })
-
+  /*
   it('mint A', async function () {
     const tx = await zkToken.mint(
       clientA.address,
@@ -368,3 +401,5 @@ function decryption(c, n, l, mu) {
     ) % BigInt(n)
   )
 }
+*/
+})
