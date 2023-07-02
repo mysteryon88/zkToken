@@ -81,7 +81,31 @@ async function regInputB() {
   })
 }
 
+async function minInputA() {
+  const value = 10
+  const r = BigInt(Math.floor(Math.random() * Number(publicKeyA.n)))
+
+  const inputAJSON = {
+    encryptedValue: publicKeyA.encrypt(value, r).toString(),
+    value: value.toString(),
+    receiverPubKey: [
+      publicKeyA.g.toString(),
+      r.toString(),
+      publicKeyA.n.toString(),
+    ],
+  }
+
+  const jsonString = JSON.stringify(inputAJSON)
+  fs.writeFile('test/inputs/mintInputA.json', jsonString, 'utf8', (err) => {
+    if (err) {
+      console.error('Error writing file:', err)
+    } else {
+    }
+  })
+}
+
 initializeKeys().then(() => {
-  //regInputA()
-  //regInputB()
+  regInputA()
+  regInputB()
+  minInputA()
 })

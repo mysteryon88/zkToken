@@ -13,15 +13,11 @@ const registrationInputB = require('./inputs/regInputB.json')
 const registrationPublicB = require('./registrationProof/publicB.json')
 const registrationProofB = require('./registrationProof/proofB.json')
 
-/*
-const registrationProofB = require('./RegistrationProof/proofB.json')
-const registrationPublicB = require('./RegistrationProof/publicB.json')
-const registrationInputB = require('./RegistrationProof/inputB.json')
-
-const mintProof = require('./MintProof/proof.json')
+const mintInput = require('./inputs/mintInputA.json')
 const mintPublic = require('./MintProof/public.json')
-const mintInput = require('./MintProof/input.json')
+const mintProof = require('./MintProof/proof.json')
 
+/*
 const transferProofA = require('./TransferProof/proofA.json')
 const transferPublicA = require('./TransferProof/publicA.json')
 const transferInputA = require('./TransferProof/inputA.json')
@@ -106,7 +102,7 @@ describe('zkToken', function () {
       registrationPublicA
     )
   })
-  /*
+
   it('verifyMintProof', async function () {
     await mintVerifier.verifyProof(
       [mintProof.pi_a[0], mintProof.pi_a[1]],
@@ -118,7 +114,7 @@ describe('zkToken', function () {
       mintPublic
     )
   })
-
+  /*
   it('verifyTransferProof', async function () {
     await transferVerifier.verifyProof(
       [transferProofA.pi_a[0], transferProofA.pi_a[1]],
@@ -151,10 +147,6 @@ describe('zkToken', function () {
       '\x1b[0m'
     )
 
-    expect(await zkToken.balanceOf(clientA.address)).to.eq(
-      registrationInputA.encryptedBalance
-    )
-
     const balance = await zkToken.balanceOf(clientA.address)
 
     console.log(
@@ -162,6 +154,10 @@ describe('zkToken', function () {
       balance,
       privateKeyA.decrypt(BigInt(balance))
     )
+
+    expect(balance).to.eq(registrationInputA.encryptedBalance)
+
+    expect(BigInt(0)).to.eq(privateKeyA.decrypt(BigInt(balance)))
   })
 
   it('registration B', async function () {
@@ -184,10 +180,6 @@ describe('zkToken', function () {
       '\x1b[0m'
     )
 
-    expect(await zkToken.balanceOf(clientB.address)).to.eq(
-      registrationInputB.encryptedBalance
-    )
-
     const balance = await zkToken.balanceOf(clientB.address)
 
     console.log(
@@ -195,8 +187,12 @@ describe('zkToken', function () {
       balance,
       privateKeyB.decrypt(BigInt(balance))
     )
+
+    expect(balance).to.eq(registrationInputB.encryptedBalance)
+
+    expect(BigInt(0)).to.eq(privateKeyB.decrypt(BigInt(balance)))
   })
-  /*
+
   it('mint A', async function () {
     const tx = await zkToken.mint(
       clientA.address,
@@ -209,15 +205,6 @@ describe('zkToken', function () {
       mintPublic
     )
 
-    expect(
-      decryption(
-        await zkToken.balanceOf(clientA.address),
-        46783589n,
-        11692464n,
-        39229921n
-      )
-    ).to.eq(mintInput.value)
-
     const receipt = await tx.wait()
 
     console.log(
@@ -227,12 +214,17 @@ describe('zkToken', function () {
       '\x1b[0m'
     )
 
-    console.log(
-      'Client A balance after mint',
-      await zkToken.balanceOf(clientA.address)
-    )
-  })
+    const balance = await zkToken.balanceOf(clientA.address)
 
+    console.log(
+      'Client A balance after registration',
+      balance,
+      privateKeyA.decrypt(BigInt(balance))
+    )
+
+    expect(BigInt(10)).to.eq(privateKeyA.decrypt(BigInt(balance)))
+  })
+  /*
   it('Revert self-transfer', async function () {
     await expect(
       zkToken.connect(clientB).transfer(
@@ -351,55 +343,19 @@ describe('zkToken', function () {
       )
     ).to.be.revertedWith('you are registered')
   })
-
+  */
   it('onlyRegistered modifier', async function () {
     await expect(
       zkToken.connect(clientB).transfer(
         clientC.address,
-        [transferProofB.pi_a[0], transferProofB.pi_a[1]],
+        [mintProof.pi_a[0], mintProof.pi_a[1]],
         [
-          [transferProofB.pi_b[0][1], transferProofB.pi_b[0][0]],
-          [transferProofB.pi_b[1][1], transferProofB.pi_b[1][0]],
+          [mintProof.pi_b[0][1], mintProof.pi_b[0][0]],
+          [mintProof.pi_b[1][1], mintProof.pi_b[1][0]],
         ],
-        [transferProofB.pi_c[0], transferProofB.pi_c[1]],
-        transferPublicB
+        [mintProof.pi_c[0], mintProof.pi_c[1]],
+        mintPublic
       )
     ).to.be.revertedWith('user not registered')
   })
-})
-
-// exponentiation modulo
-function pow(base, exp, mod) {
-  let res = 1n
-  while (exp != 0n) {
-    if ((exp & 1n) != 0n) {
-      res = BigInt(res * base) % mod
-    }
-    base = BigInt(base * base) % mod
-    exp >>= 1n
-  }
-  return res
-}
-
-// Paye cryptosystem
-function div(val, by) {
-  return BigInt((val - (val % by)) / by)
-}
-
-function L(u, n) {
-  return div(BigInt(u) - 1n, BigInt(n))
-}
-
-function encryption(g, m, r, n) {
-  return BigInt(BigInt(pow(g, m, n * n) * pow(r, n, n * n)) % BigInt(n * n))
-}
-
-function decryption(c, n, l, mu) {
-  return BigInt(
-    BigInt(
-      L(pow(BigInt(c), BigInt(l), BigInt(n * n)), BigInt(n)) * BigInt(mu)
-    ) % BigInt(n)
-  )
-}
-*/
 })

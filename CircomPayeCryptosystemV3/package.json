@@ -13,5 +13,8 @@
     "ethers": "^5.0.0",
     "fs": "^0.0.1-security",
     "paillier-bigint": "^3.4.1"
+  },
+  "scripts": {
+    "inputs": "hardhat run scripts/inputs.js"
   }
 }
