@@ -14,18 +14,13 @@ const registrationPublicB = require('./registrationProof/publicB.json')
 const registrationProofB = require('./registrationProof/proofB.json')
 
 const mintInput = require('./inputs/mintInputA.json')
-const mintPublic = require('./MintProof/public.json')
-const mintProof = require('./MintProof/proof.json')
+const mintPublic = require('./mintProof/public.json')
+const mintProof = require('./mintProof/proof.json')
 
-/*
-const transferProofA = require('./TransferProof/proofA.json')
-const transferPublicA = require('./TransferProof/publicA.json')
-const transferInputA = require('./TransferProof/inputA.json')
+const transferInputAtoB = require('./inputs/transferInputA.json')
+const transferPublicAtoB = require('./transferProof/publicAtoB.json')
+const transferProofAtoB = require('./transferProof/proofAtoB.json')
 
-const transferProofB = require('./TransferProof/proofB.json')
-const transferPublicB = require('./TransferProof/publicB.json')
-const transferInputB = require('./TransferProof/inputB.json')
-*/
 describe('zkToken', function () {
   let zkToken,
     registrationVerifier,
@@ -114,19 +109,19 @@ describe('zkToken', function () {
       mintPublic
     )
   })
-  /*
+
   it('verifyTransferProof', async function () {
     await transferVerifier.verifyProof(
-      [transferProofA.pi_a[0], transferProofA.pi_a[1]],
+      [transferProofAtoB.pi_a[0], transferProofAtoB.pi_a[1]],
       [
-        [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
-        [transferProofA.pi_b[1][1], transferProofA.pi_b[1][0]],
+        [transferProofAtoB.pi_b[0][1], transferProofAtoB.pi_b[0][0]],
+        [transferProofAtoB.pi_b[1][1], transferProofAtoB.pi_b[1][0]],
       ],
-      [transferProofA.pi_c[0], transferProofA.pi_c[1]],
-      transferPublicA
+      [transferProofAtoB.pi_c[0], transferProofAtoB.pi_c[1]],
+      transferPublicAtoB
     )
   })
-*/
+
   it('registration A', async function () {
     const tx = await zkToken.connect(clientA).registration(
       [registrationProofA.pi_a[0], registrationProofA.pi_a[1]],
@@ -224,18 +219,18 @@ describe('zkToken', function () {
 
     expect(BigInt(10)).to.eq(privateKeyA.decrypt(BigInt(balance)))
   })
-  /*
+
   it('Revert self-transfer', async function () {
     await expect(
       zkToken.connect(clientB).transfer(
         clientB.address,
-        [transferProofA.pi_a[0], transferProofA.pi_a[1]],
+        [transferProofAtoB.pi_a[0], transferProofAtoB.pi_a[1]],
         [
-          [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
-          [transferProofA.pi_b[1][1], transferProofA.pi_b[1][0]],
+          [transferProofAtoB.pi_b[0][1], transferProofAtoB.pi_b[0][0]],
+          [transferProofAtoB.pi_b[1][1], transferProofAtoB.pi_b[1][0]],
         ],
-        [transferProofA.pi_c[0], transferProofA.pi_c[1]],
-        transferPublicA
+        [transferProofAtoB.pi_c[0], transferProofAtoB.pi_c[1]],
+        transferPublicAtoB
       )
     ).to.be.revertedWith('you cannot send tokens to yourself')
   })
@@ -243,13 +238,13 @@ describe('zkToken', function () {
   it('Transfer A to B', async function () {
     const tx = await zkToken.connect(clientA).transfer(
       clientB.address,
-      [transferProofA.pi_a[0], transferProofA.pi_a[1]],
+      [transferProofAtoB.pi_a[0], transferProofAtoB.pi_a[1]],
       [
-        [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
-        [transferProofA.pi_b[1][1], transferProofA.pi_b[1][0]],
+        [transferProofAtoB.pi_b[0][1], transferProofAtoB.pi_b[0][0]],
+        [transferProofAtoB.pi_b[1][1], transferProofAtoB.pi_b[1][0]],
       ],
-      [transferProofA.pi_c[0], transferProofA.pi_c[1]],
-      transferPublicA
+      [transferProofAtoB.pi_c[0], transferProofAtoB.pi_c[1]],
+      transferPublicAtoB
     )
 
     const receipt = await tx.wait()
@@ -261,75 +256,16 @@ describe('zkToken', function () {
       '\x1b[0m'
     )
 
-    expect(await zkToken.balanceOf(clientA.address)).to.eq(
-      transferInputA.newEncryptedBalance
-    )
+    const balanceA = await zkToken.balanceOf(clientA.address)
+    const balanceB = await zkToken.balanceOf(clientB.address)
 
-    expect(
-      decryption(
-        await zkToken.balanceOf(clientB.address),
-        17942993n,
-        8967090n,
-        15889415n
-      )
-    ).to.eq(transferInputA.value)
+    console.log('Client A balance after transfer A to B', balanceA)
+    console.log('Client B balance after transfer A to B', balanceB)
 
-    console.log(
-      'Client A balance after transfer A to B',
-      await zkToken.balanceOf(clientA.address)
-    )
-
-    console.log(
-      'Client B balance after transfer A to B',
-      await zkToken.balanceOf(clientB.address)
-    )
+    expect(BigInt(6)).to.eq(privateKeyA.decrypt(BigInt(balanceA)))
+    expect(BigInt(4)).to.eq(privateKeyB.decrypt(BigInt(balanceB)))
   })
 
-  it('Transfer B to A', async function () {
-    const tx = await zkToken.connect(clientB).transfer(
-      clientA.address,
-      [transferProofB.pi_a[0], transferProofB.pi_a[1]],
-      [
-        [transferProofB.pi_b[0][1], transferProofB.pi_b[0][0]],
-        [transferProofB.pi_b[1][1], transferProofB.pi_b[1][0]],
-      ],
-      [transferProofB.pi_c[0], transferProofB.pi_c[1]],
-      transferPublicB
-    )
-
-    const receipt = await tx.wait()
-
-    console.log(
-      'Gas used by transfer: ',
-      '\x1b[33m',
-      receipt.gasUsed.toString(),
-      '\x1b[0m'
-    )
-
-    expect(await zkToken.balanceOf(clientB.address)).to.eq(
-      transferInputB.newEncryptedBalance
-    )
-
-    expect(
-      decryption(
-        await zkToken.balanceOf(clientA.address),
-        46783589n,
-        11692464n,
-        39229921n
-      )
-    ).to.eq(BigInt(transferInputB.value) + 5n) // 5 - old balance
-
-    console.log(
-      'Client A balance after transfer B to A',
-      await zkToken.balanceOf(clientA.address)
-    )
-
-    console.log(
-      'Client B balance after transfer B to A',
-      await zkToken.balanceOf(clientB.address)
-    )
-  })
-*/
   it('revert error registration', async function () {
     await expect(
       zkToken.connect(clientA).registration(

@@ -123,16 +123,19 @@ contract zkToken {
             input
         );
 
-        User storage user = users[_to];
+        User storage receiver = users[_to];
+        User storage sender = users[msg.sender];
 
         if (transferProofIsCorrect) {
             unchecked {
-                user.encryptedBalance =
-                    (user.encryptedBalance * input[1]) %
-                    user.key.powN2;
-            }
+                receiver.encryptedBalance =
+                    (receiver.encryptedBalance * input[2]) %
+                    receiver.key.powN2;
 
-            users[msg.sender].encryptedBalance = input[2];
+                sender.encryptedBalance =
+                    (sender.encryptedBalance * input[1]) %
+                    sender.key.powN2;
+            }
             emit Transfer(_to);
         } else revert WrongProof("Wrong proof");
     }

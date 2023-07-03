@@ -1,7 +1,13 @@
 const paillierBigint = require('paillier-bigint')
 const fs = require('fs')
 
-let publicKeyA, privateKeyA, publicKeyB, privateKeyB
+let publicKeyA,
+  privateKeyA,
+  publicKeyB,
+  privateKeyB,
+  balanceAZero,
+  balanceBZero,
+  balanceAMint
 
 async function initializeKeys() {
   const keysA = await paillierBigint.generateRandomKeys(32)
@@ -47,8 +53,9 @@ async function regInputA() {
   const zero = 0n
   const r = BigInt(Math.floor(Math.random() * Number(publicKeyA.n)))
 
+  balanceAZero = publicKeyA.encrypt(zero, r).toString()
   const inputAJSON = {
-    encryptedBalance: publicKeyA.encrypt(zero, r).toString(),
+    encryptedBalance: balanceAZero.toString(),
     balance: '0',
     pubKey: [publicKeyA.g.toString(), r.toString(), publicKeyA.n.toString()],
   }
@@ -66,8 +73,10 @@ async function regInputB() {
   const zero = 0n
   const r = BigInt(Math.floor(Math.random() * Number(publicKeyB.n)))
 
+  balanceBZero = publicKeyB.encrypt(zero, r).toString()
+
   const inputAJSON = {
-    encryptedBalance: publicKeyB.encrypt(zero, r).toString(),
+    encryptedBalance: balanceBZero.toString(),
     balance: '0',
     pubKey: [publicKeyB.g.toString(), r.toString(), publicKeyB.n.toString()],
   }
@@ -81,12 +90,13 @@ async function regInputB() {
   })
 }
 
-async function minInputA() {
+async function mintInputA() {
   const value = 10
   const r = BigInt(Math.floor(Math.random() * Number(publicKeyA.n)))
+  balanceAMint = publicKeyA.encrypt(value, r).toString()
 
   const inputAJSON = {
-    encryptedValue: publicKeyA.encrypt(value, r).toString(),
+    encryptedValue: balanceAMint.toString(),
     value: value.toString(),
     receiverPubKey: [
       publicKeyA.g.toString(),
@@ -104,8 +114,52 @@ async function minInputA() {
   })
 }
 
+async function transferInputA() {
+  const value = 4
+  const rA = BigInt(Math.floor(Math.random() * Number(publicKeyA.n)))
+  const rB = BigInt(Math.floor(Math.random() * Number(publicKeyB.n)))
+
+  const encryptedSenderBalance = publicKeyA.addition(
+    BigInt(balanceAZero),
+    BigInt(balanceAMint)
+  )
+
+  const inputAJSON = {
+    encryptedSenderBalance: encryptedSenderBalance.toString(),
+    encryptedSenderValue: publicKeyA
+      .encrypt(BigInt(publicKeyA.n) - BigInt(value), rA)
+      .toString(),
+    encryptedReceiverValue: publicKeyB.encrypt(value, rB).toString(),
+    value: value.toString(),
+    senderPubKey: [
+      publicKeyA.g.toString(),
+      rA.toString(),
+      publicKeyA.n.toString(),
+    ],
+    receiverPubKey: [
+      publicKeyB.g.toString(),
+      rB.toString(),
+      publicKeyB.n.toString(),
+    ],
+    senderPrivKey: [
+      privateKeyA.lambda.toString(),
+      privateKeyA.mu.toString(),
+      privateKeyA.n.toString(),
+    ],
+  }
+
+  const jsonString = JSON.stringify(inputAJSON)
+  fs.writeFile('test/inputs/transferInputA.json', jsonString, 'utf8', (err) => {
+    if (err) {
+      console.error('Error writing file:', err)
+    } else {
+    }
+  })
+}
+
 initializeKeys().then(() => {
   regInputA()
   regInputB()
-  minInputA()
+  mintInputA()
+  transferInputA()
 })

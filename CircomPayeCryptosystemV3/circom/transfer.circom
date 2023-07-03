@@ -50,7 +50,7 @@ template Main() {
 	component pow6 = Binpower();
 
 	pow5.b <== senderPubKey[0];
-	pow5.e <== value;
+	pow5.e <== senderPubKey[2] - value;
 	pow5.modulo <== senderPubKey[2] * senderPubKey[2];
 
 	pow6.b <== senderPubKey[1];

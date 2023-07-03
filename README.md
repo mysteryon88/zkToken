@@ -7,7 +7,7 @@
 
 ## CircomPayeCryptosystemV1
 
-The first version of the token protocol with hidden balances. 
+The first version of the token protocol with hidden balances.
 
 Uses homomorphic encryption (Paye cryptosystem) of balances, sums up balances inside a smart contract.
 
