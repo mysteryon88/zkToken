@@ -329,21 +329,21 @@ describe('zkToken', function () {
       await zkToken.balanceOf(clientB.address)
     )
   })
-
+*/
   it('revert error registration', async function () {
     await expect(
       zkToken.connect(clientA).registration(
-        [transferProofA.pi_a[0], transferProofA.pi_a[1]],
+        [registrationProofA.pi_a[0], registrationProofA.pi_a[1]],
         [
-          [transferProofA.pi_b[0][1], transferProofA.pi_b[0][0]],
-          [transferProofA.pi_b[1][1], transferProofA.pi_b[1][0]],
+          [registrationProofA.pi_b[0][1], registrationProofA.pi_b[0][0]],
+          [registrationProofA.pi_b[1][1], registrationProofA.pi_b[1][0]],
         ],
-        [transferProofA.pi_c[0], transferProofA.pi_c[1]],
+        [registrationProofA.pi_c[0], registrationProofA.pi_c[1]],
         registrationPublicA
       )
     ).to.be.revertedWith('you are registered')
   })
-  */
+
   it('onlyRegistered modifier', async function () {
     await expect(
       zkToken.connect(clientB).transfer(
