@@ -143,16 +143,17 @@ describe('zkToken', function () {
     )
 
     const balance = await zkToken.balanceOf(clientA.address)
+    const decryptedBalance = privateKeyA.decrypt(BigInt(balance))
 
     console.log(
       'Client A balance after registration',
       balance,
-      privateKeyA.decrypt(BigInt(balance))
+      decryptedBalance
     )
 
     expect(balance).to.eq(registrationInputA.encryptedBalance)
 
-    expect(BigInt(0)).to.eq(privateKeyA.decrypt(BigInt(balance)))
+    expect(BigInt(0)).to.eq(decryptedBalance)
   })
 
   it('registration B', async function () {
@@ -177,15 +178,16 @@ describe('zkToken', function () {
 
     const balance = await zkToken.balanceOf(clientB.address)
 
+    const decryptedBalance = privateKeyB.decrypt(BigInt(balance))
     console.log(
       'Client B balance after registration',
       balance,
-      privateKeyB.decrypt(BigInt(balance))
+      decryptedBalance
     )
 
     expect(balance).to.eq(registrationInputB.encryptedBalance)
 
-    expect(BigInt(0)).to.eq(privateKeyB.decrypt(BigInt(balance)))
+    expect(BigInt(0)).to.eq(decryptedBalance)
   })
 
   it('mint A', async function () {
@@ -210,14 +212,15 @@ describe('zkToken', function () {
     )
 
     const balance = await zkToken.balanceOf(clientA.address)
+    const decryptedBalance = privateKeyA.decrypt(BigInt(balance))
 
     console.log(
       'Client A balance after registration',
       balance,
-      privateKeyA.decrypt(BigInt(balance))
+      decryptedBalance
     )
 
-    expect(BigInt(10)).to.eq(privateKeyA.decrypt(BigInt(balance)))
+    expect(BigInt(10)).to.eq(decryptedBalance)
   })
 
   it('Revert self-transfer', async function () {
@@ -259,11 +262,22 @@ describe('zkToken', function () {
     const balanceA = await zkToken.balanceOf(clientA.address)
     const balanceB = await zkToken.balanceOf(clientB.address)
 
-    console.log('Client A balance after transfer A to B', balanceA)
-    console.log('Client B balance after transfer A to B', balanceB)
+    const decryptedBalanceA = privateKeyA.decrypt(BigInt(balanceA))
+    const decryptedBalanceB = privateKeyB.decrypt(BigInt(balanceB))
 
-    expect(BigInt(6)).to.eq(privateKeyA.decrypt(BigInt(balanceA)))
-    expect(BigInt(4)).to.eq(privateKeyB.decrypt(BigInt(balanceB)))
+    console.log(
+      'Client A balance after transfer A to B',
+      balanceA,
+      decryptedBalanceA
+    )
+    console.log(
+      'Client B balance after transfer A to B',
+      balanceB,
+      decryptedBalanceB
+    )
+
+    expect(BigInt(6)).to.eq(decryptedBalanceA)
+    expect(BigInt(4)).to.eq(decryptedBalanceB)
   })
 
   it('revert error registration', async function () {
