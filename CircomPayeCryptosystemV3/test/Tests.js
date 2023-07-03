@@ -295,6 +295,20 @@ describe('zkToken', function () {
     )
       .to.be.revertedWithCustomError(zkToken, 'WrongProof')
       .withArgs('Wrong proof')
+
+    await expect(
+      zkToken.connect(clientC).registration(
+        [registrationProofA.pi_a[0], registrationProofA.pi_a[1]],
+        [
+          [registrationProofA.pi_b[0][1], registrationProofA.pi_b[0][0]],
+          [registrationProofA.pi_b[1][1], registrationProofA.pi_b[1][0]],
+        ],
+        [registrationProofA.pi_c[0], registrationProofA.pi_c[1]],
+        registrationPublicB
+      )
+    )
+      .to.be.revertedWithCustomError(zkToken, 'WrongProof')
+      .withArgs('Wrong proof')
   })
 
   it('revert error registration', async function () {
@@ -324,5 +338,14 @@ describe('zkToken', function () {
         mintPublic
       )
     ).to.be.revertedWith('user not registered')
+  })
+
+  it('getPubKey', async function () {
+    const pubKey = await zkToken.getPubKey(clientA.address)
+    expect([
+      BigInt(pubKey.g),
+      BigInt(pubKey.n),
+      BigInt(pubKey.powN2),
+    ]).to.deep.equal([publicKeyA.g, publicKeyA.n, publicKeyA.n * publicKeyA.n])
   })
 })

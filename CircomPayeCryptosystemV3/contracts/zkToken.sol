@@ -90,7 +90,7 @@ contract zkToken {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint /*4*/[] memory input
+        uint /*1*/[] memory input
     ) external onlyRegistered(_to) zeroAddress(_to) {
         bool mintProofIsCorrect = mintVerifierAddr.verifyProof(a, b, c, input);
 
@@ -142,11 +142,12 @@ contract zkToken {
         } else revert WrongProof("Wrong proof");
     }
 
+/*
     modifier onlyFee() {
         require(msg.value >= 0.001 ether, "Not enough fee!");
         _;
     }
-
+*/
     modifier onlyRegistered(address _to) {
         require(users[_to].encryptedBalance != 0, "user not registered");
         _;

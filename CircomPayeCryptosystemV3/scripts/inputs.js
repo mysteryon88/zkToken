@@ -114,7 +114,7 @@ async function mintInputA() {
   })
 }
 
-async function transferInputA() {
+async function transferInputAtoB() {
   const value = 4
   const rA = BigInt(Math.floor(Math.random() * Number(publicKeyA.n)))
   const rB = BigInt(Math.floor(Math.random() * Number(publicKeyB.n)))
@@ -161,5 +161,5 @@ initializeKeys().then(() => {
   regInputA()
   regInputB()
   mintInputA()
-  transferInputA()
+  transferInputAtoB()
 })
