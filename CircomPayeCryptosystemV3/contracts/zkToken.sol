@@ -112,7 +112,7 @@ contract zkToken {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint /*9*/[] memory input
+        uint /*2*/[] memory input
     ) external payable /* onlyFee */ onlyRegistered(_to) zeroAddress(_to) {
         require(msg.sender != _to, "you cannot send tokens to yourself");
 
@@ -129,11 +129,11 @@ contract zkToken {
         if (transferProofIsCorrect) {
             unchecked {
                 receiver.encryptedBalance =
-                    (receiver.encryptedBalance * input[2]) %
+                    (receiver.encryptedBalance * input[1]) %
                     receiver.key.powN2;
 
                 sender.encryptedBalance =
-                    (sender.encryptedBalance * input[1]) %
+                    (sender.encryptedBalance * input[0]) %
                     sender.key.powN2;
             }
             emit Transfer(_to);

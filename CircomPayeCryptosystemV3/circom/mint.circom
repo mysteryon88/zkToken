@@ -29,7 +29,7 @@ template Main() {
 
 // public data
 component main {
-		public [encryptedValue,			// calculates + send to mint function
-				receiverPubKey] 		// in storage + rand r
+		public [encryptedValue]		// calculates + send to mint function
 				} = Main();
+
 

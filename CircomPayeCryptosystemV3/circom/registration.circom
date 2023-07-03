@@ -29,6 +29,6 @@ template Main() {
 // public data
 component main {
 		public [encryptedBalance, 	// encrypted 0
-				pubKey]				// in storage + rand r
+				pubKey]				// to storage + rand r
 				} = Main();
 

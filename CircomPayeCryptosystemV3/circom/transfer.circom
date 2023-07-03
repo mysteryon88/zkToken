@@ -63,10 +63,6 @@ template Main() {
 
 // public data
 component main {
-		public [encryptedSenderBalance, 	// in storage
-				encryptedSenderValue, 		// sender calculates + send to transfer function
-				encryptedReceiverValue,		// sender calculates + send to transfer function
-				receiverPubKey, 			// in storage + rand r
-				senderPubKey]				// in storage + rand r
+		public [encryptedSenderValue, 		// sender calculates + send to transfer function
+				encryptedReceiverValue]		// sender calculates + send to transfer function	
 				} = Main();
-
