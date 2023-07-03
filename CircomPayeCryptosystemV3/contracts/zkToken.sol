@@ -112,9 +112,14 @@ contract zkToken {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint /*2*/[] memory input
+        uint /*3*/[] memory input
     ) external payable /* onlyFee */ onlyRegistered(_to) zeroAddress(_to) {
         require(msg.sender != _to, "you cannot send tokens to yourself");
+
+        User storage receiver = users[_to];
+        User storage sender = users[msg.sender];
+        
+        input[0] = sender.encryptedBalance;
 
         bool transferProofIsCorrect = transferVerifierAddr.verifyProof(
             a,
@@ -123,17 +128,14 @@ contract zkToken {
             input
         );
 
-        User storage receiver = users[_to];
-        User storage sender = users[msg.sender];
-
         if (transferProofIsCorrect) {
             unchecked {
                 receiver.encryptedBalance =
-                    (receiver.encryptedBalance * input[1]) %
+                    (receiver.encryptedBalance * input[2]) %
                     receiver.key.powN2;
 
                 sender.encryptedBalance =
-                    (sender.encryptedBalance * input[0]) %
+                    (sender.encryptedBalance * input[1]) %
                     sender.key.powN2;
             }
             emit Transfer(_to);

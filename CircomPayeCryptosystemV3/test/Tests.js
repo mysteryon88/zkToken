@@ -280,6 +280,23 @@ describe('zkToken', function () {
     expect(BigInt(4)).to.eq(decryptedBalanceB)
   })
 
+  it('custom error wrong proof', async function () {
+    await expect(
+      zkToken.connect(clientA).transfer(
+        clientB.address,
+        [transferProofAtoB.pi_a[0], transferProofAtoB.pi_a[1]],
+        [
+          [transferProofAtoB.pi_b[0][1], transferProofAtoB.pi_b[0][0]],
+          [transferProofAtoB.pi_b[1][1], transferProofAtoB.pi_b[1][0]],
+        ],
+        [transferProofAtoB.pi_c[0], transferProofAtoB.pi_c[1]],
+        transferPublicAtoB
+      )
+    )
+      .to.be.revertedWithCustomError(zkToken, 'WrongProof')
+      .withArgs('Wrong proof')
+  })
+
   it('revert error registration', async function () {
     await expect(
       zkToken.connect(clientA).registration(
