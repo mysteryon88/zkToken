@@ -33,6 +33,8 @@ Uses homomorphic balance encryption (Paye cryptosystem), the balances of the rec
 
 `npm run proofs`: generate proofs
 
+`npm run siberiumTest`: testing in Siberium testnet
+
 Tools: circom (Linux) + snarkJS + using paillier-bigint
 
 ## ZoKratesSHA256
