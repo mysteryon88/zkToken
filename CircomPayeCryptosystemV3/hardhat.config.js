@@ -1,4 +1,5 @@
 require('@nomicfoundation/hardhat-toolbox')
+require('hardhat-abi-exporter')
 require('dotenv').config()
 
 const privateKey =
