@@ -32,10 +32,16 @@ async function main() {
   const blockNumber = await provider.getBlockNumber()
   console.log('Current block number:', blockNumber)
 
+  const gasPrice = await provider.getGasPrice()
+  console.log('Gas price:', ethers.utils.formatUnits(gasPrice, 'gwei'))
+
   const wallet = new ethers.Wallet(privateKey, provider)
 
   const balance = await provider.getBalance(wallet.address)
   console.log('Current balance:', ethers.utils.formatEther(balance))
+
+  const nonce = await provider.getTransactionCount(wallet.address)
+  console.log('Current nonce:', nonce)
 
   const zkToken = new ethers.Contract(adresses.ZKTOKEN, abiZKToken, wallet)
   const name = await zkToken.name()

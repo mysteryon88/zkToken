@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@openzeppelin/contracts": "^4.9.1",
+    "axios": "^1.4.0",
     "child_process": "^1.0.2",
     "dotenv": "^16.0.3",
     "ethers": "^5.0.0",
