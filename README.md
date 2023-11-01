@@ -1,10 +1,5 @@
 # zkToken
 
-## Final repositories
-
-[Contracts](https://github.com/druzhtech/zkToken-contracts) |
-[Web interface](https://github.com/druzhtech/zkToken-front)
-
 ## CircomPayeCryptosystemV1
 
 The first version of the token protocol with hidden balances.
